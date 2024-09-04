@@ -13,7 +13,5 @@ def majority_filter(input_raster, output_raster, cell_size):
 
 # 重采样
 def resample_raster(input_raster, output_raster, cell_size):
-    re = arcpy.management.Resample(input_raster, output_raster, cell_size, "MAJORITY")
-    if output_raster:
-        re.save(output_raster)
-    return re
+    arcpy.management.Resample(input_raster, output_raster, cell_size, "MAJORITY")
+    return output_raster

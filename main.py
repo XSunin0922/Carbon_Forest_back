@@ -6,17 +6,18 @@ arcpy.env.workspace = r"D:\Desktop\cfb"
 arcpy.env.overwriteOutput = True
 
 input_raster = "zsj_lulc_10.tif"
-output_raster = "z_l_10_maj21.tif"
-
-maj = majority_filter(input_raster, output_raster, 21)
-resample_raster(maj, "z_l_10_maj21_resample.tif", 2000)
+resam = resample_raster(input_raster, "z_l_10_resample.tif", 2000)
+maj = majority_filter(resam, "z_l_10_resample_maj11.tif", 11)
 
 params = {
-    'raster_path': 'z_l_10_maj21_resample.tif',
-    'store_name': 'z_l_10_maj21_resample',
-    'layer_name': 'z_l_10_maj21_resample',
+    'data_path': 'z_l_10_resample_maj11.tif',
+    'data_type': 'GeoTIFF',
+    'workspace': 'carbon',
+    'store_name': 'z_l_10_resample_maj11',
+    'layer_name': 'z_l_10_resample_maj11',
+    'style': 'lulc_image',
     'srs': 'EPSG:4326'
 }
 publisher = Publisher()
 publisher.publish_params_set(params)
-publisher.publish_raster()
+publisher.publish()
