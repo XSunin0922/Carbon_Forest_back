@@ -88,4 +88,4 @@ class Publisher:
         if response.status_code == 201 & 200:
             print(f'Create Layer {self.layer_name} success')
         else:
-            print(response.status_code, response.content)
+            print(f'Create Layer {self.layer_name} failed', response.content)
