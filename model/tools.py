@@ -4,6 +4,7 @@ from arcpy.sa import *
 import pandas as pd
 from openpyxl import Workbook, load_workbook
 
+workspace = 'D:/Desktop/cfb/data/'
 arcpy.env.workspace = r"D:\Desktop\cfb\data"
 arcpy.env.overwriteOutput = True
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4548)
@@ -91,10 +92,10 @@ class EdgeEffectMeasure:
             arcpy.management.SelectLayerByAttribute("cache_point_lyr", "NEW_SELECTION", "RASTERVALU = -9999")
             arcpy.management.DeleteFeatures("cache_point_lyr")
             workbook = Workbook()
-            if os.path.exists(f"D:/Desktop/cfb/data/{self.output_table}"):
-                os.remove(f"D:/Desktop/cfb/data/{self.output_table}")
-            workbook.save(f"D:/Desktop/cfb/data/{self.output_table}")
-            workbook = load_workbook(f"D:/Desktop/cfb/data/{self.output_table}")
+            if os.path.exists(f"{workspace}{self.output_table}"):
+                os.remove(f"{workspace}{self.output_table}")
+            workbook.save(f"{workspace}{self.output_table}")
+            workbook = load_workbook(f"{workspace}{self.output_table}")
             step = self.edge_distance / self.distance_class
             with arcpy.da.SearchCursor(self.neighbor_extent, ['FID', 'gridcode']) as cursor:
                 # 遍历每个邻域
@@ -124,7 +125,7 @@ class EdgeEffectMeasure:
                         if average != 0:
                             sheet[f'A{i + 2}'] = end_dis
                             sheet[f'B{i + 2}'] = average
-                            workbook.save(f"D:/Desktop/cfb/data/{self.output_table}")
+                            workbook.save(f"{workspace}{self.output_table}")
                         start_dis = end_dis
                         end_dis += step
         finally:
@@ -132,16 +133,23 @@ class EdgeEffectMeasure:
             arcpy.management.Delete("cache_polygon_lyr")
 
     def __gather_table(self):
-        table = pd.ExcelFile(f"D:/Desktop/cfb/data/{self.output_table}")
-        summary_df = pd.DataFrame(columns=['gridcode', 'distance'])
+        table = pd.ExcelFile(f"{workspace}{self.output_table}")
+        gridcode_sheet_dict = {}
         for sheet in table.sheet_names:
-            table_df = pd.read_excel(table, sheet=sheet)
-            grouped = table_df.groupby('distance')['distance'].mean().reset_index()
-            summary_df = pd.concat([summary_df, grouped], ignore_index=True)
-            re_summary = summary_df.groupby('gridcode')['distance'].mean().reset_index()
-            re_summary.columns -= ['gridcode', 'distance']
-            re_summary.to_excel(f"D:/Desktop/cfb/data/{self.output_table}", sheet_name='summary', index=False)
-    
+            df_sheet = pd.read_excel(table, sheet_name=sheet)
+            gridcode = sheet.split('_')[1]
+            if gridcode not in gridcode_sheet_dict:
+                gridcode_sheet_dict[gridcode] = []
+            gridcode_sheet_dict[gridcode].append(df_sheet)
+        summary_dict = {}
+        for gridcode, sheet_list in gridcode_sheet_dict.items():
+            combined_df = pd.concat(sheet_list)
+            summary_df = combined_df.groupby('distance', as_index=False)['value'].mean()
+            summary_dict[gridcode] = summary_df
+        with pd.ExcelWriter(f"{workspace}{self.output_table}", mode='a', engine='openpyxl') as writer:
+            for gridcode, summary_df in summary_dict.items():
+                summary_df.to_excel(writer, sheet_name=f'summary_{gridcode}', index=False)
+
     def edge_effect_measure(self):
         self.__carbon_points_extract()
         self.__accept_points()

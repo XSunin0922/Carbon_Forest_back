@@ -1,5 +1,4 @@
-import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from model.tools import *
 from publish import Publisher
@@ -13,7 +12,7 @@ def publish():
     publisher = Publisher()
     publisher.publish_params_set(data)
     publisher.publish()
-    return jsonify({'message': 'Publish success'})
+    return jsonify({'message': 'success'})
 
 @app.route('/simplify', methods=['POST'])
 def simplify_model():
@@ -21,7 +20,7 @@ def simplify_model():
     simplify = Simplify()
     simplify.simplify_params_set(data)
     simplify.simplify()
-    return jsonify({'message': 'Publish success'})
+    return jsonify({'message': 'success'})
 
 @app.route('/neighbor_recognition', methods=['POST'])
 def neighbor_recognition_model():
@@ -29,7 +28,7 @@ def neighbor_recognition_model():
     neighborRecognition = NeighborRecognition()
     neighborRecognition.neighbor_recognition_params_set(data)
     neighborRecognition.neighbor_recognition()
-    return jsonify({'message': 'Publish success'})
+    return jsonify({'message': 'success'})
 
 @app.route('/edge_effect_measure', methods=['POST'])
 def edge_effect_measure_model():
@@ -37,7 +36,7 @@ def edge_effect_measure_model():
     edgeEffectMeasure = EdgeEffectMeasure()
     edgeEffectMeasure.edge_effect_measure_params_set(data)
     edgeEffectMeasure.edge_effect_measure()
-    return jsonify({'message': 'Publish success'})
+    return send_file(f'D:/Desktop/cfb/data/{data["output_table"]}', as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=4001)
