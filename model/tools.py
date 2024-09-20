@@ -136,6 +136,8 @@ class EdgeEffectMeasure:
         table = pd.ExcelFile(f"{workspace}{self.output_table}")
         gridcode_sheet_dict = {}
         for sheet in table.sheet_names:
+            if not '_' in sheet:
+                continue
             df_sheet = pd.read_excel(table, sheet_name=sheet)
             gridcode = sheet.split('_')[1]
             if gridcode not in gridcode_sheet_dict:
