@@ -5,9 +5,10 @@ import pandas as pd
 from openpyxl import Workbook, load_workbook
 
 workspace = 'D:/Desktop/cfb/data/'
-arcpy.env.workspace = r"D:\Desktop\cfb\data"
-arcpy.env.overwriteOutput = True
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4548)
+# test environment:
+# arcpy.env.workspace = r"D:\Desktop\cfb\data"
+# arcpy.env.overwriteOutput = True
+# arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4548)
 
 
 class Simplify:

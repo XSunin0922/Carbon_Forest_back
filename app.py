@@ -1,10 +1,9 @@
+import arcpy
 from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS
 from model.tools import *
 from publish import Publisher
 
 app = Flask(__name__)
-CORS(app)
 
 @app.route('/publish', methods=['POST'])
 def publish():
@@ -16,6 +15,9 @@ def publish():
 
 @app.route('/simplify', methods=['POST'])
 def simplify_model():
+    arcpy.env.workspace = r"D:\Desktop\cfb\data"
+    arcpy.env.overwriteOutput = True
+    arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4548)
     data = request.json
     simplify = Simplify()
     simplify.simplify_params_set(data)
@@ -24,6 +26,9 @@ def simplify_model():
 
 @app.route('/neighbor_recognition', methods=['POST'])
 def neighbor_recognition_model():
+    arcpy.env.workspace = r"D:\Desktop\cfb\data"
+    arcpy.env.overwriteOutput = True
+    arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4548)
     data = request.json
     neighborRecognition = NeighborRecognition()
     neighborRecognition.neighbor_recognition_params_set(data)
@@ -32,6 +37,9 @@ def neighbor_recognition_model():
 
 @app.route('/edge_effect_measure', methods=['POST'])
 def edge_effect_measure_model():
+    arcpy.env.workspace = r"D:\Desktop\cfb\data"
+    arcpy.env.overwriteOutput = True
+    arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4548)
     data = request.json
     edgeEffectMeasure = EdgeEffectMeasure()
     edgeEffectMeasure.edge_effect_measure_params_set(data)
