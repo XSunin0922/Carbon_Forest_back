@@ -39,7 +39,7 @@ class NeighborRecognition:
         self.forest_index = None
 
     def neighbor_recognition_params_set(self, obj):
-        self.input_raster = obj['input_raster']
+        self.input_raster = obj['simplified_raster']
         self.output_feature = obj['output_feature']
         self.forest_index = obj['forest_index']
 
@@ -149,9 +149,9 @@ class EdgeEffectMeasure:
             combined_df = pd.concat(sheet_list)
             summary_df = combined_df.groupby('distance', as_index=False)['value'].mean()
             summary_dict[gridcode] = summary_df
-        with pd.ExcelWriter(f"{workspace}{self.output_table}", mode='a', engine='openpyxl') as writer:
+        with engine.connect() as connection:
             for gridcode, summary_df in summary_dict.items():
-                summary_df.to_excel(writer, sheet_name=f'summary_{gridcode}', index=False)
+                summary_df.to_sql(f'summary_{gridcode}', con=connection, schema='computed', if_exists='replace', index=False)
 
     def edge_effect_measure(self):
         self.__carbon_points_extract()

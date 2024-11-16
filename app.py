@@ -1,9 +1,10 @@
-import arcpy
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
 from model.tools import *
 from publish import Publisher
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/publish', methods=['POST'])
 def publish():
